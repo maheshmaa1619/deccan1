@@ -1,13 +1,18 @@
 import React, {useState} from 'react'
 import axios from 'axios'
+import { API_BASE } from '../config'
 
 export default function Login(){
   const [u,setU] = useState('admin')
   const [p,setP] = useState('password')
   const submit = async ()=>{
-    const r = await axios.post('http://localhost:4000/auth/login',{ username: u, password: p })
-    localStorage.setItem('token', r.data.token)
-    window.location.href = '/'
+    try {
+      const r = await axios.post(`${API_BASE}/auth/login`,{ username: u, password: p })
+      localStorage.setItem('token', r.data.token)
+      window.location.href = '/'
+    } catch(e) {
+      alert('Login failed')
+    }
   }
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
