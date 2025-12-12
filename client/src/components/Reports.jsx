@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import { API_BASE } from '../config'
 
 export default function Reports(){
   const [clients, setClients] = useState([])
-  useEffect(()=>{ axios.get('http://localhost:4000/clients').then(r=>setClients(r.data)) },[])
+  useEffect(()=>{ axios.get(`${API_BASE}/clients`).then(r=>setClients(r.data)).catch(()=>setClients([])) },[])
   // Simple reports: clients count, avg fee, sample overdue
   const avgFee = clients.length ? (clients.reduce((s,c)=>s + (c.fee_amount||0),0) / clients.length).toFixed(2) : '0'
   return (
