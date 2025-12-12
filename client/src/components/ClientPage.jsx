@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import { API_BASE } from '../config'
 
 export default function ClientPage(){
   const { id } = useParams()
   const [data, setData] = useState(null)
-  useEffect(()=>{ axios.get(`http://localhost:4000/clients/${id}`).then(r=>setData(r.data)) },[id])
+  useEffect(()=>{ axios.get(`${API_BASE}/clients/${id}`).then(r=>setData(r.data)) },[id])
   if(!data) return <div>Loading...</div>
   const { client, tasks, calls, payments } = data
   const toggleTask = (taskId, newStatus)=>{
-    axios.patch(`http://localhost:4000/tasks/${taskId}`,{ status: newStatus }).then(()=>{
+    axios.patch(`${API_BASE}/tasks/${taskId}`,{ status: newStatus }).then(()=>{
       setData(prev=>({ ...prev, tasks: prev.tasks.map(t=> t.id===taskId?{...t,status:newStatus}:t) }))
-    })
+    }).catch(()=>{})
   }
 
   return (
@@ -50,7 +51,7 @@ export default function ClientPage(){
       </div>
 
       <div>
-        <a className="btn" href={`http://localhost:4000/clients/${client.id}/export`}>Export Client PDF</a>
+        <a className="btn" href={`${API_BASE}/clients/${client.id}/export`}>Export Client PDF</a>
       </div>
     </div>
   )
