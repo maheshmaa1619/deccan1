@@ -1,21 +1,23 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import { API_BASE } from '../config'
+
 export default function Dashboard(){
   const [counts, setCounts] = useState(null)
   const [tasks, setTasks] = useState([])
   useEffect(()=>{
-    axios.get('http://localhost:4000/clients').then(r=>{
+    axios.get(`${API_BASE}/clients`).then(r=>{
       setCounts({ total: r.data.length })
-    })
+    }).catch(()=>setCounts({ total: 0 }))
     // load recent tasks for dashboard
-    axios.get('http://localhost:4000/clients').then(r=>{
+    axios.get(`${API_BASE}/clients`).then(r=>{
       // naive: fetch first client's tasks to show sample
       if (r.data[0]) {
-        axios.get(`http://localhost:4000/clients/${r.data[0].id}`).then(res=>{
+        axios.get(`${API_BASE}/clients/${r.data[0].id}`).then(res=>{
           setTasks(res.data.tasks)
-        })
+        }).catch(()=>{})
       }
-    })
+    }).catch(()=>{})
   },[])
   if(!counts) return <div>Loading...</div>
   return (
