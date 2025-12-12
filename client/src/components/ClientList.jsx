@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { API_BASE } from '../config'
 
 export default function ClientList(){
   const [clients, setClients] = useState([])
-  useEffect(()=>{ axios.get('http://localhost:4000/clients').then(r=>setClients(r.data)) },[])
+  useEffect(()=>{ axios.get(`${API_BASE}/clients`).then(r=>setClients(r.data)).catch(()=>setClients([])) },[])
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
