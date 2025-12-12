@@ -5,20 +5,42 @@ import { API_BASE } from '../config'
 export default function Dashboard(){
   const [counts, setCounts] = useState(null)
   const [tasks, setTasks] = useState([])
+
   useEffect(()=>{
-    axios.get(`${API_BASE}/clients`).then(r=>{
-      setCounts({ total: r.data.length })
-    }).catch(()=>setCounts({ total: 0 }))
-    // load recent tasks for dashboard
-    axios.get(`${API_BASE}/clients`).then(r=>{
-      // naive: fetch first client's tasks to show sample
-      if (r.data[0]) {
-        axios.get(`${API_BASE}/clients/${r.data[0].id}`).then(res=>{
-          setTasks(res.data.tasks)
-        }).catch(()=>{})
+    // debug logs to verify that build used the env var
+    console.log('DEBUG API_BASE =', API_BASE)
+
+    const load = async () => {
+      try {
+        const url = `${API_BASE}/clients`
+        console.log('DEBUG fetching clients from:', url)
+        const r = await axios.get(url)
+        console.log('DEBUG clients response:', r.data)
+        setCounts({ total: Array.isArray(r.data) ? r.data.length : 0 })
+
+        // fetch tasks for first client (if present)
+        if (r.data && r.data[0]) {
+          try {
+            const clientUrl = `${API_BASE}/clients/${r.data[0].id}`
+            console.log('DEBUG fetching client details from:', clientUrl)
+            const res = await axios.get(clientUrl)
+            console.log('DEBUG client details:', res.data)
+            setTasks(res.data.tasks || [])
+          } catch(err){
+            console.error('ERROR fetching client details', err);
+            setTasks([])
+          }
+        }
+      } catch(err){
+        console.error('ERROR fetching clients', err)
+        setCounts({ total: 0 })
+        setTasks([])
       }
-    }).catch(()=>{})
+    }
+
+    load()
   },[])
+
   if(!counts) return <div>Loading...</div>
   return (
     <div>
